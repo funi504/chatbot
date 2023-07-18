@@ -1,0 +1,151 @@
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 0px rgba(206, 206, 206, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(224, 224, 224);
+  outline: 1px solid rgb(255, 255, 255);
+}
+body {
+    font-family: monospace;
+}
+h1 {
+    background-color: #d4d4ee;
+    color: black;
+    display: inline-block;
+    font-size: 2em;
+    margin: 0;
+    padding: 10px;
+}
+#chatbox {
+    margin-left: 3%;
+    margin-right: 3%;
+    width: 94%;
+    margin-top: 20px;
+    overflow-y:auto;
+    height:510px;
+    
+}
+#userInput {
+
+    
+    height: 30px;
+    display:flex;
+    flex-direction: row;
+    position: relative;
+    align-items:center;
+    bottom: 0px;
+    padding: 20px;
+    background-color:#e699ff;
+    border-radius: 0px 0px 30px 30px;
+    
+    
+
+}
+#textInput {
+    width: 100%;
+    border: none;
+    border-radius: 25px;
+    height: 50px;
+    outline: none;
+    font-family: monospace;
+    font-size: 17px;
+
+}
+.userText {
+    color: black;
+    font-family: monospace;
+    background-color: #e699ff;
+    margin-left: 35%;
+    font-size: 13px;
+    text-align: left;
+    line-height: 18px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 65%;
+    border-radius: 30px 30px 30px 0px;
+}
+.userText span {
+    
+    padding: 15px;
+    border-radius: 2px;
+}
+.botText {
+    color: black;
+    background-color: #ffdd99;
+    font-family: monospace;
+    font-size: 13px;
+    text-align: left;
+    line-height: 18px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 25px;
+    border-radius: 0px 30px 30px 30px;
+    width: 65%;
+}
+.botText span {
+    
+    border-radius: 2px;
+}
+#tidbit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+}
+
+
+#header{
+    height: 50px;
+    width:100%;
+    background-color:#d4d4ee;
+    border-radius: 35px 35px 0px 0px;
+    display: flex;
+    align-items: center;
+}
+#botName{
+    margin-left: 10%;
+    font-size: 15px;
+    font-weight: bold;
+}
+.boxed {
+    
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    width: 25%;
+    height: 650px;
+    margin-top: 10px;
+    border: 1px solid green;
+    border-radius: 40px;
+} 
+ 
+@media screen and (max-width: 1000px) {
+    .boxed {
+       position: absolute;
+       width: 98%;
+       right: 0px;
+       top: 0px;
+       height: 98vh;
+    }  
+    #chatbox {
+
+        height: 74vh;
+        margin-bottom: 20px;
+    }
+    #userInput{
+
+        position: relative;
+        bottom: 0px;
+    }
+    #header{
+
+        border-radius: 30px 30px 0px 0px;
+    }
+       
+}
+
