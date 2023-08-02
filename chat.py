@@ -8,31 +8,34 @@ import torch
 from model import NeuralNet
 from nltk_utils import bag_of_words, tokenize
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+def chatFunc(msg,project_id):
 
-with open('intents.json', 'r') as json_data:
-    intents = json.load(json_data)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-FILE = "data.pth"
-data = torch.load(FILE)
+    intent = project_id+".json"
+    with open(intent, 'r') as json_data:
+        intents = json.load(json_data)
 
-input_size = data["input_size"]
-hidden_size = data["hidden_size"]
-output_size = data["output_size"]
-all_words = data['all_words']
-tags = data['tags']
-model_state = data["model_state"]
+    FILE = project_id+".pth"
+    #FILE ="data.pth"
+    data = torch.load(FILE)
 
-model = NeuralNet(input_size, hidden_size, output_size).to(device)
-model.load_state_dict(model_state)
-model.eval()
+    input_size = data["input_size"]
+    hidden_size = data["hidden_size"]
+    output_size = data["output_size"]
+    all_words = data['all_words']
+    tags = data['tags']
+    model_state = data["model_state"]
 
-bot_name = "Ernest"
-print("Let's chat! (type 'quit' to exit)")
+    model = NeuralNet(input_size, hidden_size, output_size).to(device)
+    model.load_state_dict(model_state)
+    model.eval()
 
-def chatFunc(data):
+    bot_name = "Ernest"
+    print("Let's chat! (type 'quit' to exit)")
+
     
-    sentence = data
+    sentence = msg
     #sentence = input("You: ")
 
     #if sentence == "quit":
@@ -50,7 +53,7 @@ def chatFunc(data):
 
     probs = torch.softmax(output, dim=1)
     prob = probs[0][predicted.item()]
-    if prob.item() > 0.75:
+    if prob.item() > 0.65:
         for intent in intents['intents']:
             if tag == intent["tag"]:
                 print(f"{bot_name}: {random.choice(intent['responses'])}")
