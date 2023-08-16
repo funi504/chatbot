@@ -12,11 +12,11 @@ def chatFunc(msg,project_id):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    intent = project_id+".json"
+    intent = "intent/"+project_id+".json"
     with open(intent, 'r') as json_data:
         intents = json.load(json_data)
 
-    FILE = project_id+".pth"
+    FILE ="models/"+project_id+".pth"
     #FILE ="data.pth"
     data = torch.load(FILE)
 

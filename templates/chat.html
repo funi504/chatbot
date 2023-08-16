@@ -8,57 +8,7 @@
       <meta content="width=device-width, initial-scale=1" name="viewport" />
     </head>
     <body>
- 
-      <div class="boxed">
-        <div id="header">
-          <div id="botName">Ernest</div>
-        </div>
-        <div>
-          <div id="chatbox">
-            <p class="botText">
-
-              <span>Hi! I'm Ernest</span>
-              
-            </p>
-            <p class="botText">
-            
-              <span>You can ask me Questions</span>
-              
-            </p>
-          </div>
-          <div id="userInput">
-            <input id="textInput" type="text" name="msg" placeholder="Type here..." />
-            <div id="sendButton"> send </div>
-          </div>
-
-        </div>
-        <script>
-          function getBotResponse() {
-            var rawText = $("#textInput").val();
-            var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
-            $("#textInput").val("");
-            $("#chatbox").append(userHtml);
-            document
-              .getElementById("userInput")
-              .scrollIntoView({ block: "start", behavior: "smooth" });
-            $.get("/success", { msg: rawText }).done(function(data) {
-              var botHtml = '<p class="botText"><span>' + data + "</span></p>";
-              $("#chatbox").append(botHtml);
-              document
-                .getElementById("userInput")
-                .scrollIntoView({ block: "start", behavior: "smooth" });
-            });
-          }
-          $("#textInput").keypress(function(e) {
-            if (e.which == 13) {
-              getBotResponse();
-            }
-          });
-
-          $("#sendButton").click(function(){
-            getBotResponse();
-          });
-        </script>
-      </div>
+      
+      password changed
     </body>
   </html>

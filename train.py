@@ -13,7 +13,7 @@ from model import NeuralNet
 
 def train(project_id):
 
-  intent_file = project_id+".json"
+  intent_file = "intent/"+project_id+".json"
   
   with open(intent_file,'r') as f:
     intents = json.load(f)
@@ -133,5 +133,5 @@ def train(project_id):
   "all_words": all_words,
   "tags": tags
   }
-  FILE = project_id+".pth"
+  FILE ="models/"+project_id+".pth"
   torch.save(data, FILE)
