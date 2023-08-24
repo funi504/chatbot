@@ -34,3 +34,16 @@ class EmailConfig(db.Model):
     provider = db.Column(db.String(50) , nullable=False)
     password = db.Column(db.String(50) , nullable=False)
     created_on = db.Column(db.DateTime, nullable=True)
+
+class googleApiConfig(db.Model):
+    __tablename__ = "googleApiConfig"
+    id = db.Column(db.String(32) , primary_key=True , unique=True , default=get_uuid)
+    project_id = db.Column(db.String(32) )
+    user_id = db.Column(db.String(32) )
+    email = db.Column(db.String(50) , nullable=False)
+    token = db.Column(db.String(320) )
+    refresh_token = db.Column(db.String(320) )
+    token_uri = db.Column(db.String(320) )
+    client_id = db.Column(db.String(320) )
+    client_secret = db.Column(db.String(320) )
+    scopes = db.Column(db.String(320) )

@@ -1,4 +1,6 @@
+from http import client
 import os
+import flask
 from flask import *
 from flask_cors import CORS ,cross_origin
 from flask_bcrypt import Bcrypt
@@ -7,10 +9,14 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from chat import chatFunc
 from train import train
-from  databaseModel import  db , User , Project, EmailConfig
+from  databaseModel import  db , User , Project, EmailConfig, googleApiConfig
 from config import ApplicationConfig , configEmail
+from create_mail import create_message , send_email
 import json ,datetime 
 from urllib.parse import urlparse
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True,)
@@ -20,6 +26,13 @@ bcrypt = Bcrypt(app)
 server_session = Session(app)
 mail = Mail(app)
 
+CLIENT_SECRETS_FILE = "credentials.json"
+
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+API_SERVICE_NAME = 'gmail'
+API_VERSION = 'v1'
+
+app.secret_key = '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'
 s = URLSafeTimedSerializer('Thisisasecret!-fjvnnjj2@123vvjk45ancnv9*')
 
 db.init_app(app)
@@ -58,6 +71,7 @@ def get_current_user():
 
             user.email = email
             user.domain = domain
+            user.confirmed = False
 
             db.session.commit()
 
@@ -111,7 +125,8 @@ def create_Project():
                 "user_Id": new_project.user_id
 
             })
-        except:
+        except Exception as e:
+            print(e) 
             return jsonify({ "error": "something went wrong , try later"})
     
     if request.method == "GET":
@@ -396,6 +411,7 @@ def login_user():
         return jsonify({"error": "confirm email first , confirm email sent"})
 
     session["user_id"] = user.id
+    flask.session["userId"] = user.id
 
     return jsonify({
         "id": user.id,
@@ -435,8 +451,10 @@ def send_email():
     #get data from form
     data = request.get_json()
 
+    print(data)
     #get project id from 
     project_id = data['project_id']
+    
     #email template
     sender_name = data['name']
     sender_email = data['email']
@@ -472,7 +490,7 @@ def send_email():
     msg.body = body
     mail.send(msg)
 
-    return 'Email sent!'
+    return jsonify({"response":"email sent"})
 
 #TODO : test this routes
 @app.route('/emailConfig', methods=['POST','GET','PUT','DELETE'])
@@ -549,10 +567,229 @@ def emailConfiguration():
             return jsonify({"message": "the config has been deleted"})
         except:
             return jsonify({"error":"config  not found"})
+######################################################################################
+
+@app.route('/sendemail' , methods=['POST'])
+def test_api_request():
+ 
+  request_data = request.get_json()
+
+  name = request_data['name']
+  email = request_data['email']
+  user_message = request_data['message']
+  message_sent = f"name: {name} , Email: {email} , message:{user_message}"
+  project_id = request_data['project_Id']
+
+  try:
+    EmailConfigData = googleApiConfig.query.filter_by(project_id=project_id).first()
+    if EmailConfigData is not None:
+        pass
+    else:
+        return jsonify({"error": "app not configured to send emais"})
+  except Exception as e:
+    print(e)
+
+  data = {'token': EmailConfigData.token,
+          'refresh_token': EmailConfigData.refresh_token,
+          'token_uri': EmailConfigData.token_uri,
+          'client_id': EmailConfigData.client_id,
+          'client_secret': EmailConfigData.client_secret,
+          'scopes': [EmailConfigData.scopes]}
+  #credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
+  credentials = google.oauth2.credentials.Credentials(**data)
+   
+  print(credentials)
+
+  drive = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
+  print(drive)
+  # ACTION ITEM: In a production app, you likely want to save these
+  #              credentials in a persistent database instead.
+  #flask.session['credentials'] = credentials_to_dict(credentials)
+  try:
+
+    if EmailConfigData is not None:
+
+        if credentials.refresh_token is not None:
+
+            EmailConfigData.refresh_token = credentials.refresh_token
+            db.session.commit()
+
+  except Exception as e:
+      print(e)
+
+
+  try:
+    service = drive
+    sender =EmailConfigData.email 
+    to =EmailConfigData.email 
+    subject = name
+    message_text = message_sent
+    message = create_message(sender, to, subject, message_text)
+    service.users().messages().send(userId='me', body=message).execute()
+    
+  except Exception as e:
+    return f"An error occurred: {e}"
+
+  return 'sent' 
+
+
+@app.route('/authorize')
+def authorize():
+  # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+  flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+      CLIENT_SECRETS_FILE, scopes=SCOPES)
+
+  # The URI created here must exactly match one of the authorized redirect URIs
+  # for the OAuth 2.0 client, which you configured in the API Console. If this
+  # value doesn't match an authorized URI, you will get a 'redirect_uri_mismatch'
+  # error.
+  flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+  authorization_url, state = flow.authorization_url(
+      # Enable offline access so that you can refresh an access token without
+      # re-prompting the user for permission. Recommended for web server apps.
+      access_type='offline',
+      # Enable incremental authorization. Recommended as a best practice.
+      include_granted_scopes='true')
+
+  # Store the state so the callback can verify the auth server response.
+  flask.session['state'] = state
+  print("we at authorize")
+
+  return flask.redirect(authorization_url)
+
+
+@app.route('/oauth2callback') 
+def oauth2callback():
+  # Specify the state when creating the flow in the callback so that it can
+  # verified in the authorization server response.
+  try:
+    user_id = session.get("user_id")
+    #user = flask.session['userId']
+    
+    print(" this user id is at oauth2callback :"+ user_id) 
+    #user_id = "c9f9c2e77b0e447ba45f304b216f09ce"
+    project = Project.query.filter_by(user_id=user_id).first()
+    project_id = project.project_id
+    #project_id = "6e86a4e67fa74268901256442ea37d09" 
+    user = User.query.filter_by(id=user_id).first()
+    email = user.email
+    #print(user_id)
+  except Exception as e :
+    print(e)
+    return 'error occured with the ids '
+
+  state = flask.session['state']
+
+  flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+      CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+  flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+  # Use the authorization server's response to fetch the OAuth 2.0 tokens.
+  authorization_response = flask.request.url
+  flow.fetch_token(authorization_response=authorization_response)
+
+  # Store credentials in the session.
+  # ACTION ITEM: In a production app, you likely want to save these
+  #              credentials in a persistent database instead.
+  credentials = flow.credentials
+  #flask.session['credentials'] = credentials_to_dict(credentials)
+  #credentials = credentials_to_dict(credentials)
+  print(credentials)
+  try:
+    EmailConfigData = googleApiConfig.query.filter_by(project_id=project_id).first()
+
+    if EmailConfigData is not None:
+
+        if credentials.refresh_token is not None:
+
+            EmailConfigData.refresh_token = credentials.refresh_token
+            db.session.commit()
+
+    else:
+        token = credentials.token
+        refresh_token = credentials.refresh_token
+        token_uri = credentials.token_uri
+        client_id = credentials.client_id
+        client_secret = credentials.client_secret
+        scopes = credentials.scopes[0]
+        #email = email
+
+        new_config = googleApiConfig(project_id=project_id,email=email,
+                                        user_id=user_id,token=token,
+                                        refresh_token=refresh_token,
+                                        token_uri=token_uri,
+                                        client_id=client_id,
+                                        client_secret=client_secret,
+                                        scopes=scopes)
+
+        db.session.add(new_config)
+        db.session.commit()
+
+  except Exception as e :
+
+      print(e)
+      return 'error' 
+    
+  #return flask.redirect(flask.url_for('test_api_request'))
+  return 'saved'
+  #return redirect(url_for('save_config',token=token, refresh_token=refresh_token, token_uri=token_uri, client_id=client_id, client_secret=client_secret, scopes=scopes ))
+
+
+@app.route('/saveconfig')
+def save_config(token):
+    print(token)
+
+
+
+@app.route("/deleteemailconfig" , methods=['GET','POST', 'DELETE'])
+def delete_mail_config():
+    try:
+        user_id = session.get("user_id")
+        #user = flask.session['userId']
+        
+        print("user id :"+ user_id) 
+        #user_id = "c9f9c2e77b0e447ba45f304b216f09ce"
+        project = Project.query.filter_by(user_id=user_id).first()
+        project_id = project.project_id
+        #project_id = "6e86a4e67fa74268901256442ea37d09" 
+        user = User.query.filter_by(user_id=user_id).first()
+        email = user.email
+        #print(user_id)
+    except Exception as e :
+        print(e)
+
+    if request.method == 'DELETE':
+        EmailConfigData = googleApiConfig.query.filter_by(project_id=project_id).first()
+        if EmailConfigData is not None:
+            db.session.delete(EmailConfigData)
+            db.session.commit()
+            return 'deleted'
+
+    if request.method == 'GET':
+
+        EmailConfigData = googleApiConfig.query.filter_by(project_id=project_id).first()
+        if EmailConfigData is not None:
+            return jsonify({'token': EmailConfigData.token,
+            'refresh_token': EmailConfigData.refresh_token,
+            'token_uri': EmailConfigData.token_uri,
+            'client_id': EmailConfigData.client_id,
+            'client_secret': EmailConfigData.client_secret,
+            'scopes': [EmailConfigData.scopes]}) 
+    return jsonify({"error":"no config"})
+
+def credentials_to_dict(credentials): 
+  return {'token': credentials.token,
+          'refresh_token': credentials.refresh_token,
+          'token_uri': credentials.token_uri,
+          'client_id': credentials.client_id,
+          'client_secret': credentials.client_secret,
+          'scopes': credentials.scopes}
+
 
 
 # main driver function
 if __name__ == '__main__':
  
-
-    app.run(debug=True)
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    app.run('localhost', 8080, debug=True)

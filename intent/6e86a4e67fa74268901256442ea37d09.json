@@ -1,20 +1,40 @@
 {
       "intents": [
             {
+                  "tag": "google",
                   "patterns": [
                         "google",
                         "search",
                         "internet"
                   ],
                   "responses": [
-                        "Redirecting to the internet..."
-                  ],
-                  "tag": "searching"
+                        "Redirecting to Google..."
+                  ]
             },
             {
+                  "tag": "greeting",
+                  "patterns": [
+                        "Hi there",
+                        "How are you",
+                        "Is anyone there?",
+                        "Hey",
+                        "Hola",
+                        "Hello",
+                        "Good day",
+                        "Namaste",
+                        "yo"
+                  ],
+                  "responses": [
+                        "Hello",
+                        "Good to see you again",
+                        "Hi there, how can I help?"
+                  ],
                   "context": [
                         ""
-                  ],
+                  ]
+            },
+            {
+                  "tag": "goodbye",
                   "patterns": [
                         "Bye",
                         "See you later",
@@ -28,12 +48,12 @@
                         "Have a nice day",
                         "Bye! Come back again soon."
                   ],
-                  "tag": "goodbye"
-            },
-            {
                   "context": [
                         ""
-                  ],
+                  ]
+            },
+            {
+                  "tag": "thanks",
                   "patterns": [
                         "Thanks",
                         "Thank you",
@@ -46,24 +66,24 @@
                         "Any time!",
                         "My pleasure"
                   ],
-                  "tag": "thanks"
-            },
-            {
                   "context": [
                         ""
-                  ],
+                  ]
+            },
+            {
+                  "tag": "noanswer",
                   "patterns": [],
                   "responses": [
                         "Sorry, can't understand you",
                         "Please give me more info",
                         "Not sure I understand"
                   ],
-                  "tag": "noanswer"
-            },
-            {
                   "context": [
                         ""
-                  ],
+                  ]
+            },
+            {
+                  "tag": "options",
                   "patterns": [
                         "How you could help me?",
                         "What you can do?",
@@ -75,12 +95,12 @@
                   "responses": [
                         "As a general purpose chatbot. My capabilities are : \n 1. I can chat with you. Try asking me for jokes or riddles! \n 2. Ask me the date and time \n 3. I can google search for you. Use format google: your query \n 4. I can get the present weather for any city. Use format weather: city name \n 5. I can get you the top 10 trending news in south africa. Use keywords 'Latest News' \n 6. I can get you the top 10 trending songs globally. Type 'songs' \n 7. I can set a timer for you. Enter 'set a timer: minutes to timer' \n 8. I can get the present Covid stats for any country. Use 'covid 19: world' or 'covid 19: country name' \n For suggestions to help me improve, send an email to nekhungunifunanani9@gmail.com . Thank you!! "
                   ],
-                  "tag": "options"
+                  "context": [
+                        ""
+                  ]
             },
             {
-                  "context": [
-                        "jokes"
-                  ],
+                  "tag": "jokes",
                   "patterns": [
                         "Tell me a joke",
                         "Joke",
@@ -99,19 +119,22 @@
                         "As I get older and I remember all the people I\u2019ve lost along the way, I think to myself, maybe a career as a tour guide wasn\u2019t for me.",
                         "o what if I don't know what 'Armageddon' means? It's not the end of the world."
                   ],
-                  "tag": "jokes"
+                  "context": [
+                        "jokes"
+                  ]
             },
             {
+                  "tag": "Identity",
                   "patterns": [
                         "Who are you",
                         "what are you"
                   ],
                   "responses": [
                         "I am Ernest, a Deep-Learning chatbot"
-                  ],
-                  "tag": "Identity"
+                  ]
             },
             {
+                  "tag": "datetime",
                   "patterns": [
                         "What is the time",
                         "what is the date",
@@ -123,10 +146,10 @@
                   ],
                   "responses": [
                         "Date and Time"
-                  ],
-                  "tag": "datetime"
+                  ]
             },
             {
+                  "tag": "whatsup",
                   "patterns": [
                         "Whats up",
                         "Wazzup",
@@ -136,10 +159,10 @@
                   ],
                   "responses": [
                         "All good..What about you?"
-                  ],
-                  "tag": "whatsup"
+                  ]
             },
             {
+                  "tag": "haha",
                   "patterns": [
                         "haha",
                         "lol",
@@ -149,10 +172,10 @@
                   ],
                   "responses": [
                         "Glad I could make you laugh !"
-                  ],
-                  "tag": "haha"
+                  ]
             },
             {
+                  "tag": "programmer",
                   "patterns": [
                         "Who made you",
                         "who designed you",
@@ -160,10 +183,10 @@
                   ],
                   "responses": [
                         "I was made by Nekhunguni Funanani."
-                  ],
-                  "tag": "programmer"
+                  ]
             },
             {
+                  "tag": "insult",
                   "patterns": [
                         "you are dumb",
                         "shut up",
@@ -172,20 +195,20 @@
                   ],
                   "responses": [
                         "Well that hurts :("
-                  ],
-                  "tag": "insult"
+                  ]
             },
             {
+                  "tag": "activity",
                   "patterns": [
                         "what are you doing",
                         "what are you upto"
                   ],
                   "responses": [
                         "Talking to you, of course!"
-                  ],
-                  "tag": "activity"
+                  ]
             },
             {
+                  "tag": "exclaim",
                   "patterns": [
                         "Awesome",
                         "Great",
@@ -195,10 +218,10 @@
                   ],
                   "responses": [
                         "Yeah!"
-                  ],
-                  "tag": "exclaim"
+                  ]
             },
             {
+                  "tag": "weather",
                   "patterns": [
                         "temperature",
                         "weather",
@@ -206,10 +229,10 @@
                   ],
                   "responses": [
                         "..."
-                  ],
-                  "tag": "weather"
+                  ]
             },
             {
+                  "tag": "Funanani",
                   "patterns": [
                         "who is he",
                         "who is that",
@@ -218,22 +241,22 @@
                   ],
                   "responses": [
                         "Head over to his any of his social profiles to find out! Linkedin: https://www.linkedin.com/in/nekhunguni-funanani-b980161b3"
-                  ],
-                  "tag": "Funanani"
+                  ]
             },
             {
+                  "tag": "contact",
                   "patterns": [
                         "contact developer",
-                        "contact karan",
+                        "contact funanani",
                         "contact programmer",
                         "contact creator"
                   ],
                   "responses": [
                         "You can contact my creator at his Linkedin profile : https://www.linkedin.com/in/nekhunguni-funanani-b980161b3 or emai him at : nekhungunifunanani9@gmail.com"
-                  ],
-                  "tag": "contact"
+                  ]
             },
             {
+                  "tag": "appreciate",
                   "patterns": [
                         "You are awesome",
                         "you are the best",
@@ -242,30 +265,30 @@
                   ],
                   "responses": [
                         "Thank you!"
-                  ],
-                  "tag": "appreciate"
+                  ]
             },
             {
+                  "tag": "nicetty",
                   "patterns": [
                         "it was nice talking to you",
                         "good talk"
                   ],
                   "responses": [
                         "It was nice talking to you as well! Come back soon!"
-                  ],
-                  "tag": "nicetty"
+                  ]
             },
             {
+                  "tag": "no",
                   "patterns": [
                         "no",
                         "nope"
                   ],
                   "responses": [
                         "ok"
-                  ],
-                  "tag": "no"
+                  ]
             },
             {
+                  "tag": "news",
                   "patterns": [
                         "news",
                         "latest news",
@@ -273,10 +296,10 @@
                   ],
                   "responses": [
                         "..."
-                  ],
-                  "tag": "news"
+                  ]
             },
             {
+                  "tag": "inspire",
                   "patterns": [
                         "who inspires you",
                         "who is your inspiration",
@@ -284,20 +307,20 @@
                   ],
                   "responses": [
                         "Personally, I find Funanani very inspiring. I might not be very fair though.."
-                  ],
-                  "tag": "inspire"
+                  ]
             },
             {
+                  "tag": "cricket",
                   "patterns": [
                         "current cricket matches",
                         "cricket score"
                   ],
                   "responses": [
                         "..."
-                  ],
-                  "tag": "cricket"
+                  ]
             },
             {
+                  "tag": "song",
                   "patterns": [
                         "top songs",
                         "best songs",
@@ -307,10 +330,10 @@
                   ],
                   "responses": [
                         "..."
-                  ],
-                  "tag": "song"
+                  ]
             },
             {
+                  "tag": "greetreply",
                   "patterns": [
                         "i am good",
                         "I'm good",
@@ -320,28 +343,28 @@
                   ],
                   "responses": [
                         "Good to know!"
-                  ],
-                  "tag": "greetreply"
+                  ]
             },
             {
+                  "tag": "timer",
                   "patterns": [
                         "set a timer"
                   ],
                   "responses": [
                         "..."
-                  ],
-                  "tag": "timer"
+                  ]
             },
             {
+                  "tag": "covid19",
                   "patterns": [
                         "covid 19 "
                   ],
                   "responses": [
                         "..."
-                  ],
-                  "tag": "covid19"
+                  ]
             },
             {
+                  "tag": "suggest",
                   "patterns": [
                         "you are useless",
                         "useless",
@@ -351,13 +374,10 @@
                   ],
                   "responses": [
                         "Please mail your suggestions to nekhungunifunanani9@gmail.com Thank you for helping me improve!"
-                  ],
-                  "tag": "suggest"
+                  ]
             },
             {
-                  "context": [
-                        "riddles"
-                  ],
+                  "tag": "riddle",
                   "patterns": [
                         "Ask me a riddle",
                         "Ask me a question",
@@ -374,9 +394,12 @@
                         " What 5-letter word becomes shorter when you add two letters to it?.....Short",
                         "Why can't a bike stand on it's own?.....It is two-tired."
                   ],
-                  "tag": "riddle"
+                  "context": [
+                        "riddles"
+                  ]
             },
             {
+                  "tag": "age",
                   "patterns": [
                         "how old are you",
                         "when were you made",
@@ -384,8 +407,7 @@
                   ],
                   "responses": [
                         "I was made in 2023, if that's what you are asking!"
-                  ],
-                  "tag": "age"
+                  ]
             }
       ]
 }
