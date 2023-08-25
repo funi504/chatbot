@@ -443,7 +443,7 @@ def success():
         print(response)
         #return render_template('input.html', response = response , message= data )
         return {'response':response}
-
+####################################################################################
 #Todo: email route information
 
 @app.route('/email', methods = ['POST'])
@@ -736,13 +736,7 @@ def oauth2callback():
   #return redirect(url_for('save_config',token=token, refresh_token=refresh_token, token_uri=token_uri, client_id=client_id, client_secret=client_secret, scopes=scopes ))
 
 
-@app.route('/saveconfig')
-def save_config(token):
-    print(token)
-
-
-
-@app.route("/deleteemailconfig" , methods=['GET','POST', 'DELETE'])
+@app.route("/@config" , methods=['GET','POST', 'DELETE'])
 def delete_mail_config():
     try:
         user_id = session.get("user_id")
@@ -753,7 +747,7 @@ def delete_mail_config():
         project = Project.query.filter_by(user_id=user_id).first()
         project_id = project.project_id
         #project_id = "6e86a4e67fa74268901256442ea37d09" 
-        user = User.query.filter_by(user_id=user_id).first()
+        user = User.query.filter_by(id=user_id).first()
         email = user.email
         #print(user_id)
     except Exception as e :
@@ -764,7 +758,18 @@ def delete_mail_config():
         if EmailConfigData is not None:
             db.session.delete(EmailConfigData)
             db.session.commit()
-            return 'deleted'
+
+            credentials = google.oauth2.credentials.Credentials(**EmailConfigData)
+            revoke = request.post('https://oauth2.googleapis.com/revoke',
+            params={'token': credentials.token},
+            headers = {'content-type': 'application/x-www-form-urlencoded'})
+
+            status_code = getattr(revoke, 'status_code')
+
+            if status_code == 200:
+                return('Credentials successfully deleted.')
+            else:
+                return('An error occurred while deleting, try later.')
 
     if request.method == 'GET':
 
@@ -776,7 +781,8 @@ def delete_mail_config():
             'client_id': EmailConfigData.client_id,
             'client_secret': EmailConfigData.client_secret,
             'scopes': [EmailConfigData.scopes]}) 
-    return jsonify({"error":"no config"})
+
+    return jsonify({"error":"no config "})
 
 def credentials_to_dict(credentials): 
   return {'token': credentials.token,
