@@ -92,7 +92,7 @@ def get_current_user():
         except:
             return jsonify({"error":"account not found"})
             
-#todo: test the creation of intent fie when you create a new project
+
 @app.route("/project" , methods=["POST","GET","DELETE", "PUT"])
 def create_Project():
     user_id =session.get("user_id")
@@ -272,7 +272,7 @@ def train_model():
 
     return jsonify({"message":"model trained"})
 
-#TODO : check if email confirmation is working
+
 @app.route('/register' ,methods = ['POST'])
 def register_user():
     try:
@@ -318,7 +318,7 @@ def register_user():
         return jsonify({"error": "the was an error registering your account"})
 
 
-#TODO : check if email confirmation is working when you create an account
+
 @app.route('/confirm_email/<token>')
 def confirm_email(token):
 
@@ -378,7 +378,7 @@ def forgot_password():
         
         return jsonify({"error": "something went wrong"})
 
-#TODO : check if email confirmation is working when you log in
+
 @app.route('/login' ,methods = ['POST'])
 def login_user():
 
@@ -444,7 +444,6 @@ def success():
         #return render_template('input.html', response = response , message= data )
         return {'response':response}
 ####################################################################################
-#Todo: email route information
 
 @app.route('/email', methods = ['POST'])
 def send_email():
@@ -492,7 +491,7 @@ def send_email():
 
     return jsonify({"response":"email sent"})
 
-#TODO : test this routes
+
 @app.route('/emailConfig', methods=['POST','GET','PUT','DELETE'])
 def emailConfiguration():
 
@@ -569,6 +568,7 @@ def emailConfiguration():
             return jsonify({"error":"config  not found"})
 ######################################################################################
 
+#TODO: edit the formating of the email and test all api endpoints
 @app.route('/sendemail' , methods=['POST'])
 def test_api_request():
  
@@ -577,7 +577,7 @@ def test_api_request():
   name = request_data['name']
   email = request_data['email']
   user_message = request_data['message']
-  message_sent = f"name: {name} , Email: {email} , message:{user_message}"
+  message_sent = f'name: {name} \n'+ f'\n' + f'Email: {email}\n' + f'\n' + f'{user_message}\n' 
   project_id = request_data['project_Id']
 
   try:
@@ -630,7 +630,7 @@ def test_api_request():
   except Exception as e:
     return f"An error occurred: {e}"
 
-  return 'sent' 
+  return jsonify({"response":"email sent"}) 
 
 
 @app.route('/authorize')
