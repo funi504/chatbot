@@ -9,7 +9,7 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from chat import chatFunc
 from train import train
-from  databaseModel import  db , User , Project, EmailConfig, googleApiConfig
+from  databaseModel import  db , User , Project,Workflow, EmailConfig, googleApiConfig
 from config import ApplicationConfig , configEmail
 from create_mail import create_message , send_email
 import json ,datetime 
@@ -200,6 +200,95 @@ def create_Project():
         except Exception as error:
             print(error)
             return jsonify({ "error": "something went wrong , try later"})
+
+@app.route("/workflow", methods=["POST","GET","DELETE"])
+def workFlow():
+    user_id =session.get("user_id")
+
+    if request.method == 'GET':
+        project = Project.query.filter_by(user_id=user_id).first()
+        workflow = Workflow.query.filter_by(user_id=user_id)
+        
+        try:
+            if not user_id:
+                return jsonify({"error":"unauthorized"}),401
+            
+            if not project:
+                return jsonify({"error":"unauthorized, no project  found"}),401
+            
+            if not workflow : 
+                return jsonify({"error":"unauthorized, no workflow found"}),401
+            
+            return jsonify({
+                "nodes": workflow.Nodes,
+                "edges": workflow.edges
+            })
+            
+
+        except Exception as e:
+            return jsonify({"error":" something went wrong, try later"})
+
+    if request.method == "POST":
+
+        project = Project.query.filter_by(user_id=user_id).first()
+        workflow = Workflow.query.filter_by(user_id=user_id)
+
+        data = request.get_json()
+        nodes = data['nodes']
+        edges = data['edges']
+        
+        try:
+            if not user_id:
+                return jsonify({"error":"unauthorized"}),401
+            
+            if not project:
+                return jsonify({"error":"unauthorized, no project  found"}),401
+            
+            if not workflow : 
+                project_id = project.project_id
+                new_workflow = Workflow(user_id=user_id ,project_id=project_id, nodes=nodes, edges=edges)
+                db.session.add(new_workflow)
+                db.session.commit()
+            
+                return jsonify({
+                    "nodes": new_workflow.nodes,
+                    "edges": new_workflow.edges
+                })
+            
+            workflow.nodes = nodes
+            workflow.edges = edges
+            db.session.commit()
+
+            return jsonify({
+                    "nodes": workflow.nodes,
+                    "edges": workflow.edges
+                })
+            
+
+        except Exception as e:
+            return jsonify({"error":" something went wrong, try later"})
+
+    if request.method == "DELETE":
+        project = Project.query.filter_by(user_id=user_id).first()
+        workflow = Workflow.query.filter_by(user_id=user_id)
+        
+        try:
+            if not user_id:
+                return jsonify({"error":"unauthorized"}),401
+            
+            if not project:
+                return jsonify({"error":"unauthorized, no project  found"}),401
+            
+            if not workflow : 
+                return jsonify({"error":"unauthorized, no project  found"}),401
+            
+            workflow = Workflow.query.filter_by(user_id=user_id).delete()
+            db.session.commit()
+
+            return jsonify({"message": "the workflow has been deleted"})
+        
+        except Exception as e:
+            return jsonify({"error":" something went wrong, try later"})
 
 
 @app.route('/intent' , methods=["POST","GET","PUT"])
@@ -449,47 +538,52 @@ def success():
 def send_email():
     #get data from form
     data = request.get_json()
+    try:
+        print(data)
+        #get project id from 
+        project_id = data['project_id']
+        
+        #email template
+        sender_name = data['name']
+        sender_email = data['email']
+        sender_message = data['message']
 
-    print(data)
-    #get project id from 
-    project_id = data['project_id']
-    
-    #email template
-    sender_name = data['name']
-    sender_email = data['email']
-    sender_message = data['message']
+        #get email config data of the onwer of the project from the main server
+        #project_id = request.get_json(['project_id'])
 
-    #get email config data of the onwer of the project from the main server
-    #project_id = request.get_json(['project_id'])
+        configData = EmailConfig.query.filter_by(project_id=project_id).first()
 
-    configData = EmailConfig.query.filter_by(project_id=project_id).first()
+        print(configData)
+        
+        config_email = configData.email
+        config_provider = configData.provider
+        config_password = configData.password
 
-    print(configData)
-    
-    config_email = configData.email
-    config_provider = configData.provider
-    config_password = configData.password
+        # Configure Flask-Mail here
+        app.config['MAIL_SERVER'] = str(config_provider)
+        app.config['MAIL_PORT'] = 587
+        app.config['MAIL_USE_TLS'] = True
+        app.config['MAIL_USERNAME'] = str(config_email)
+        app.config['MAIL_PASSWORD'] = str(config_password)
 
-    # Configure Flask-Mail here
-    app.config['MAIL_SERVER'] = str(config_provider)
-    app.config['MAIL_PORT'] = 587
-    app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = str(config_email)
-    app.config['MAIL_PASSWORD'] = str(config_password)
+        mail = Mail(app)
 
-    mail = Mail(app)
+        
 
-    
+        subject= f"Message from {sender_name}"
+        body = f"Sender's Email: {sender_email}\n\nMessage: {sender_message}"
 
-    subject= f"Message from {sender_name}"
-    body= body = f"Sender's Email: {sender_email}\n\nMessage: {sender_message}"
+        # Create and send the email
+        #msg = Message(subject=subject, sender='nekhungunifunanani9@gmail.com', recipients=['nekhungunifunanani9@gmail.com'])
+        msg = Message(subject=subject, sender= config_email , recipients=[ config_email ])
+        msg.body = body
+        mail.send(msg)
 
-    # Create and send the email
-    msg = Message(subject=subject, sender='nekhungunifunanani9@gmail.com', recipients=['nekhungunifunanani9@gmail.com'])
-    msg.body = body
-    mail.send(msg)
+        return jsonify({"response":"email sent"})
+    except Exception as e :
 
-    return jsonify({"response":"email sent"})
+        return jsonify({"response": e })
+        
 
 
 @app.route('/emailConfig', methods=['POST','GET','PUT','DELETE'])

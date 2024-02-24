@@ -24,6 +24,17 @@ class Project(db.Model):
     project_name = db.Column(db.String(50) , nullable=False)
     created_on = db.Column(db.DateTime, nullable=True)
 
+class Workflow(db.Model):
+    __tablename__ = "Workflow"
+    workflow_id = db.Column(db.String(32) , primary_key=True , unique=True , default=get_uuid)
+    project_id = db.Column(db.String(32) )
+    user_id =db.Column(db.String(32) )
+    created_on = db.Column(db.DateTime, nullable=True)
+    nodes = db.Column(db.ARRAY(db.JSON), nullable=True)
+    edges = db.Column(db.ARRAY(db.JSON), nullable=True)
+
+    
+
 class EmailConfig(db.Model):
 
     __tablename__ = "emailConfig"
