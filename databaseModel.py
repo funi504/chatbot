@@ -30,8 +30,8 @@ class Workflow(db.Model):
     project_id = db.Column(db.String(32) )
     user_id =db.Column(db.String(32) )
     created_on = db.Column(db.DateTime, nullable=True)
-    nodes = db.Column(db.ARRAY(db.JSON), nullable=True)
-    edges = db.Column(db.ARRAY(db.JSON), nullable=True)
+    nodes = db.Column(db.String(), nullable=True)
+    edges = db.Column(db.String(), nullable=True)
 
     
 

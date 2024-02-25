@@ -206,10 +206,12 @@ def workFlow():
     user_id =session.get("user_id")
 
     if request.method == 'GET':
-        project = Project.query.filter_by(user_id=user_id).first()
-        workflow = Workflow.query.filter_by(user_id=user_id)
+        
         
         try:
+            project = Project.query.filter_by(user_id=user_id).first()
+            workflow = Workflow.query.filter_by(user_id=user_id).first()
+
             if not user_id:
                 return jsonify({"error":"unauthorized"}),401
             
@@ -217,25 +219,29 @@ def workFlow():
                 return jsonify({"error":"unauthorized, no project  found"}),401
             
             if not workflow : 
-                return jsonify({"error":"unauthorized, no workflow found"}),401
+                return jsonify({
+                    "nodes":[],
+                    "edges":[]
+                })
             
             return jsonify({
-                "nodes": workflow.Nodes,
-                "edges": workflow.edges
+                "nodes": json.loads(workflow.nodes),
+                "edges": json.loads(workflow.edges)
             })
             
 
         except Exception as e:
+            print(e)
             return jsonify({"error":" something went wrong, try later"})
 
     if request.method == "POST":
 
         project = Project.query.filter_by(user_id=user_id).first()
-        workflow = Workflow.query.filter_by(user_id=user_id)
+        workflow = Workflow.query.filter_by(user_id=user_id).first()
 
         data = request.get_json()
-        nodes = data['nodes']
-        edges = data['edges']
+        nodes = json.dumps(data['nodes'])
+        edges = json.dumps(data['edges'])
         
         try:
             if not user_id:
@@ -251,21 +257,24 @@ def workFlow():
                 db.session.commit()
             
                 return jsonify({
-                    "nodes": new_workflow.nodes,
-                    "edges": new_workflow.edges
+                    "nodes":json.loads(new_workflow.nodes),
+                    "edges": json.loads(new_workflow.edges),
+                    "message": "first workflow"
                 })
             
             workflow.nodes = nodes
             workflow.edges = edges
             db.session.commit()
-
+            print(workflow.nodes)
             return jsonify({
-                    "nodes": workflow.nodes,
-                    "edges": workflow.edges
+                    "nodes":json.loads(workflow.nodes),
+                    "edges":json.loads(workflow.edges),
+                    "message": "workflow updated"
                 })
             
 
         except Exception as e:
+            print(e)
             return jsonify({"error":" something went wrong, try later"})
 
     if request.method == "DELETE":
@@ -370,6 +379,7 @@ def register_user():
         email =  request.json["email"]
         domain = request.json["domain"]
         password = request.json["password"]
+        print(email)
         hashedPassword = bcrypt.generate_password_hash(password)
         date =  datetime.date.today()
 
@@ -403,8 +413,9 @@ def register_user():
             "message":"email confirmation sent , confirm email before 1 hours"
         })
 
-    except :
-        return jsonify({"error": "the was an error registering your account"})
+    except Exception as e :
+        print(e)
+        return jsonify({"error": "the was an error registering your account",})
 
 
 
