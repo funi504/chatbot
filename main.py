@@ -84,13 +84,19 @@ def get_current_user():
 
     if request.method == "DELETE":
         try:
+
             user = User.query.filter_by(id=user_id).first()
+            password = request.json["password"]
+
+            if not bcrypt.check_password_hash(user.password, password):
+                return jsonify({"error": "unauthorized"}), 401
+                
             db.session.delete(user)
             db.session.commit()
 
             return jsonify({"message": "the account has been deleted"})
         except:
-            return jsonify({"error":"account not found"})
+            return jsonify({"error":"account not found"}), 401
             
 
 @app.route("/project" , methods=["POST","GET","DELETE", "PUT"])
@@ -646,7 +652,7 @@ def reply():
                         'button_edge_target': button_edges
                     })
 
-            print(replyNode)
+            #print(replyNode)
             return jsonify({
                 'data':replyNode
             })
