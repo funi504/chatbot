@@ -1,0 +1,10 @@
+models/*
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore virtual environment directory
+venv/*
+
+# Ignore logs
+log/
