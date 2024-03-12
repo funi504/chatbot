@@ -19,9 +19,9 @@ def message_reply(user_input , project_id):
 
     use this information as context to answer the question : {context},
 
-    extract the information from the text i provided only to answer this question : {input}
+    extract the information from the text i provided only to answer this question if you know the answer: {input}
 
-    dont use other information
+    dont use other information if ,  you don't know or not sure about the answer say soo
     """
 
 
@@ -42,11 +42,11 @@ def message_reply(user_input , project_id):
 
     model_start_time = time.time()
 
-    user_input = "tell me about the university of johannesburg"
+    #user_input = "tell me about the university of johannesburg"
 
     #user input and user Id from arguments
     context = get_related_data_from_vectordb( user_input, project_id)
-
+    print(context)
     documents = context.get('documents')
 
     resp = llm_chain.invoke({
@@ -62,3 +62,5 @@ def message_reply(user_input , project_id):
 
     print(f'program running time:{program_start_time - program_end_time}')
     print(f'model running time:{model_start_time - program_end_time}')
+
+    return resp

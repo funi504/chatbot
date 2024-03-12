@@ -42,7 +42,7 @@ def upload_data_to_vectordb(url , project_id):
                 short_uuid = shortuuid.uuid()
                 documents.append(f"{' '.join(paragraph)}")
                 documents_ids.append(short_uuid)
-                metadata.append({"user_id": project_id})
+                metadata.append({"project_id": project_id})
 
             # add the documents to the vector database
             collection.add(
@@ -51,7 +51,7 @@ def upload_data_to_vectordb(url , project_id):
                 ids=documents_ids
             )
 
-            print("document added")
+            print(documents , metadata , documents_ids)
 
         except Exception as error:
             print(error)
@@ -60,11 +60,15 @@ def upload_data_to_vectordb(url , project_id):
         print("failed to fetch data")
 
 def get_related_data_from_vectordb(user_input , project_id):
+    try:
+        result = collection.query(
+        query_texts = [user_input],
+        n_results = 5,
+        where={"project_id":project_id}
+        )
+        print(f'results:{result}')
+        return result
+    
+    except Exception as e:
 
-    result = collection.query(
-    query_texts = [user_input],
-    n_results = 5,
-    where={"project_id":project_id}
-    )
-    print("got the document")
-    return result
+        return e

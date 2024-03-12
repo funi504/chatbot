@@ -316,7 +316,6 @@ def upload_url_webscrapping():
     if not project_id:
         return jsonify({"error":"project does not exist"}),401
 
-    #todo: delete this route
     if request.method == "POST":
         request_url = request.get_json()
         #print(request_msg)
