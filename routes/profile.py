@@ -1,6 +1,6 @@
 
 
-def get_current_user(session, User , request , jsonify):
+def get_current_user(session, User , request , jsonify , db , bcrypt):
     try:
         user_id = session.get("user_id")
         print(user_id)
