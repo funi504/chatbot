@@ -12,52 +12,53 @@ collection = chroma_client.create_collection(name="knwoledge_base")
 
 #url = 'https://www.uj.ac.za'
 
-def upload_data_to_vectordb(url , project_id):
+def upload_data_to_vectordb(urls , project_id):
 
-    response = requests.get(url)
-    documents = []
-    documents_ids = []
-    metadata = []
+    for url in urls:
+        response = requests.get(url)
+        documents = []
+        documents_ids = []
+        metadata = []
 
 
-    if response.status_code == 200:
-        try:
-            soup = bs(response.text, 'html.parser')
+        if response.status_code == 200:
+            try:
+                soup = bs(response.text, 'html.parser')
 
-            text_content = soup.get_text()
+                text_content = soup.get_text()
 
-            words = word_tokenize(text_content)
-            # Split text into paragraphs
-            #paragraphs = text_content.split('\n\n')
+                words = word_tokenize(text_content)
+                # Split text into paragraphs
+                #paragraphs = text_content.split('\n\n')
 
-            # Set the desired number of words per chunk
-            words_per_chunk = 60
+                # Set the desired number of words per chunk
+                words_per_chunk = 60
 
-            # Split text into paragraphs of approximately 300 words each
-            paragraphs = [words[i:i + words_per_chunk] for i in range(0, len(words), words_per_chunk)]
-            # Print or use the paragraphs as needed
-            for i, paragraph in enumerate(paragraphs, 1):
-                #print(f"Paragraph {i}:\n{' '.join(paragraph)}\n")
-                # Generate a short UUID
-                short_uuid = shortuuid.uuid()
-                documents.append(f"{' '.join(paragraph)}")
-                documents_ids.append(short_uuid)
-                metadata.append({"project_id": project_id})
+                # Split text into paragraphs of approximately 300 words each
+                paragraphs = [words[i:i + words_per_chunk] for i in range(0, len(words), words_per_chunk)]
+                # Print or use the paragraphs as needed
+                for i, paragraph in enumerate(paragraphs, 1):
+                    #print(f"Paragraph {i}:\n{' '.join(paragraph)}\n")
+                    # Generate a short UUID
+                    short_uuid = shortuuid.uuid()
+                    documents.append(f"{' '.join(paragraph)}")
+                    documents_ids.append(short_uuid)
+                    metadata.append({"project_id": project_id , "page_url": url})
 
-            # add the documents to the vector database
-            collection.add(
-                documents=documents,
-                metadatas=metadata,
-                ids=documents_ids
-            )
+                # add the documents to the vector database
+                collection.add(
+                    documents=documents,
+                    metadatas=metadata,
+                    ids=documents_ids
+                )
 
-            print(documents , metadata , documents_ids)
+                print(documents , metadata , documents_ids)
 
-        except Exception as error:
-            print(error)
+            except Exception as error:
+                print(error)
 
-    else:
-        print("failed to fetch data")
+        else:
+            print("failed to fetch data")
 
 def get_related_data_from_vectordb(user_input , project_id):
     try:
