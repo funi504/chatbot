@@ -1,3 +1,7 @@
+
+# Using regex, gt and length validators 
+import gladiator as gl 
+
 def register_user( configEmail , app ,request ,bcrypt ,User, jsonify ,db , s , Message ,url_for ,mail , datetime):
     try:
         #configure email to send verification email
@@ -6,6 +10,23 @@ def register_user( configEmail , app ,request ,bcrypt ,User, jsonify ,db , s , M
         domain = request.json["domain"]
         password = request.json["password"]
         print(email)
+
+        data = {
+            'email':email,
+            'domain': domain,
+            'password':password
+        }
+
+        field_validations = ( 
+                ('email', gl.required, gl.format_email), 
+                ('password', gl.required, gl.length_min(5)), 
+                ('domain', gl.required, gl.type_(str))
+            )
+
+        if not gl.validate(field_validations, data) :
+            return jsonify({"error": "validation error",})
+
+
         hashedPassword = bcrypt.generate_password_hash(password)
         date =  datetime.date.today()
 
@@ -26,7 +47,7 @@ def register_user( configEmail , app ,request ,bcrypt ,User, jsonify ,db , s , M
 
         msg = Message('Confirm Email', sender='nekhungunifunanani9@gmail.com', recipients=[email])
 
-        link = url_for('confirm_email', token=token, _external=True)
+        link = url_for('confirm_my_email', token=token, _external=True)
 
         msg.body = 'Your link is {}'.format(link)
 
