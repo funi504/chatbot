@@ -6,10 +6,10 @@ def upload_url_webscrapping(session , Project , jsonify , request):
     project = Project.query.filter_by(user_id=user_id).first()
     project_id = project.project_id
 
-    if not user_id:
+    if  user_id is None:
         return jsonify({"error":"unauthorized"}),401
 
-    if not project_id:
+    if  project_id is None:
         return jsonify({"error":"project does not exist"}),401
 
     if request.method == "POST":
