@@ -3,10 +3,11 @@ import os
 
 def create_project(session , Project , request , jsonify , db ):
     user_id =session.get("user_id")
-
+    if user_id is None:
+        return jsonify({"error":"unauthorized"}),401
     if request.method == "POST":
         try:
-            if not user_id:
+            if user_id is None:
                 return jsonify({"error":"unauthorized"}),401
             
             project_name = request.json["Name"]
