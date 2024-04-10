@@ -2,6 +2,8 @@ import json
 
 def workflow(session , Project , request , Workflow , jsonify ,db ):
     user_id =session.get("user_id")
+    if user_id is None:
+        return jsonify({"error":"unauthorized"}),401
 
     if request.method == 'GET':
         
